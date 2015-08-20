@@ -32,24 +32,24 @@ module.exports = {
     var splitUsername = req.param('username').split(' ').join('-');
 
     Emailaddresses.validate({
-      string: req.param('email'), //#B
+      string: req.param('email'),
     }).exec({
       // An unexpected error occurred.
       error: function(err) {
-        return res.serverError(err); //#C
+        return res.serverError(err);
       },
       // The provided string is not an email address.
       invalid: function() {
-        return res.badRequest('Doesn\'t look like an email address to me!'); //#D
+        return res.badRequest('Doesn\'t look like an email address to me!'); 
       },
       // OK.
-      success: function() { //#B
+      success: function() { 
         Passwords.encryptPassword({
-          password: req.param('password'), //#A
+          password: req.param('password'), 
         }).exec({
 
           error: function(err) {
-            return res.serverError(err); //#B
+            return res.serverError(err); 
           },
 
           success: function(result) {
@@ -59,11 +59,11 @@ module.exports = {
             try {
 
               options.gravatarURL = Gravatar.getImageUrl({
-                emailAddress: req.param('email') //#A
+                emailAddress: req.param('email') 
               }).execSync();
 
             } catch (err) {
-              return res.serverError(err); //#B
+              return res.serverError(err); 
             }
 
             options.email = req.param('email');
@@ -105,82 +105,82 @@ module.exports = {
     // Try to look up user using the provided email address
     User.findOne(req.param('id')).exec(function foundUser(err, user) {
       // Handle error
-      if (err) return res.negotiate(err); //#C
+      if (err) return res.negotiate(err); 
 
       // Handle no user being found
-      if (!user) return res.notFound(); //#D
+      if (!user) return res.notFound(); 
 
       // Return the user
-      return res.json(user); //#E
+      return res.json(user); 
     });
   },
 
   delete: function(req, res) {
 
-    if (!req.param('id')) { //#A
+    if (!req.param('id')) { 
       return res.badRequest('id is a required parameter.');
     }
 
-    User.destroy({ //#B
+    User.destroy({ 
       id: req.param('id')
     }).exec(function(err, usersDestroyed) {
-      if (err) return res.negotiate(err); //#C
-      if (usersDestroyed.length === 0) { //#D
+      if (err) return res.negotiate(err); 
+      if (usersDestroyed.length === 0) { 
         return res.notFound();
       }
-      return res.ok(); //#E
+      return res.ok(); 
     });
   },
   removeProfile: function(req, res) {
 
-    if (!req.param('id')) { //#A
+    if (!req.param('id')) { 
       return res.badRequest('id is a required parameter.');
     }
 
-    User.update({ //#B
+    User.update({ 
       id: req.param('id')
     }, {
-      deleted: true //#C
+      deleted: true 
     }, function(err, removedUser) {
 
-      if (err) return res.negotiate(err); //#D
+      if (err) return res.negotiate(err); 
       if (removedUser.length === 0) {
         return res.notFound();
       }
 
-      return res.ok(); //#E
+      return res.ok(); 
     });
   },
   restoreProfile: function(req, res) {
 
-    User.findOne({ //#A
+    User.findOne({ 
       email: req.param('email')
     }, function foundUser(err, user) {
-      if (err) return res.negotiate(err); //#B
+      if (err) return res.negotiate(err); 
       if (!user) return res.notFound();
 
-      Passwords.checkPassword({ //#C
+      Passwords.checkPassword({ 
         passwordAttempt: req.param('password'),
         encryptedPassword: user.encryptedPassword
       }).exec({
 
-        error: function(err) { //#D
+        error: function(err) { 
           return res.negotiate(err);
         },
 
-        incorrect: function() { //#E
+        incorrect: function() { 
           return res.notFound();
         },
 
         success: function() {
 
-          User.update({ //#F
+          User.update({
             id: user.id
           }, {
             deleted: false
           }).exec(function(err, updatedUser) {
 
-            return res.json(updatedUser); //#G
+            return res.json(updatedUser);
           });
         }
       });
@@ -207,35 +207,35 @@ module.exports = {
     User.update({
       id: req.param('id')
     }, {
-      gravatarURL: req.param('gravatarURL') //#B
+      gravatarURL: req.param('gravatarURL') 
     }, function(err, updatedUser) {
 
-      if (err) return res.negotiate(err); //#C
+      if (err) return res.negotiate(err); 
 
-      return res.json(updatedUser); //#D
+      return res.json(updatedUser); 
 
     });
   },
 
   changePassword: function(req, res) {
 
-    if (_.isUndefined(req.param('password'))) { //#A
+    if (_.isUndefined(req.param('password'))) { 
       return res.badRequest('A password is required!');
     }
 
-    if (req.param('password').length < 6) { //#A
+    if (req.param('password').length < 6) { 
       return res.badRequest('Password must be at least 6 characters!');
     }
 
-    Passwords.encryptPassword({ //#B
+    Passwords.encryptPassword({ 
       password: req.param('password'),
     }).exec({
       error: function(err) {
-        return res.serverError(err); //#C
+        return res.serverError(err); 
       },
       success: function(result) {
 
-        User.update({ //#D
+        User.update({ 
           id: req.param('id')
         }, {
           encryptedPassword: result
@@ -243,7 +243,7 @@ module.exports = {
           if (err) {
             return res.negotiate(err);
           }
-          return res.json(updatedUser); //#E
+          return res.json(updatedUser); 
         });
       }
     });
@@ -251,24 +251,24 @@ module.exports = {
 
   adminUsers: function(req, res) {
 
-    User.find().exec(function(err, users){    //#A
+    User.find().exec(function(err, users){    
 
-      if (err) return res.negotiate(err);   //#B
+      if (err) return res.negotiate(err);   
 
-      return res.json(users);     //#C
+      return res.json(users);     
 
     });
   },
 
   updateAdmin: function(req, res) {
 
-    User.update(req.param('id'), {    //#A
-      admin: req.param('admin')   //#B
+    User.update(req.param('id'), {    
+      admin: req.param('admin')   
     }).exec(function(err, update){
 
-     if (err) return res.negotiate(err);  //#C
+     if (err) return res.negotiate(err);  
 
-      res.ok();       //#D
+      res.ok();       
     });
   },
 
