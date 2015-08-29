@@ -49,16 +49,24 @@
           {{editProfile.changePassword.errorMsg}}
           </code>
         </div>
-        <form ng-submit="changeMyPassword()">
-          <div class="control-group form-group col-md-12">
+        <form ng-submit="changeMyPassword()" name="changePassword">
+          <div class="control-group form-group col-md-12" ng-class="{'has-error':changePassword.password.$invalid && changePassword.password.$dirty}">
             <label>Choose a password</label>
-            <input type="password" class="form-control" placeholder="at least 6 characters" name="password" ng-model="editProfile.properties.password" id="password">
+            <input type="password" class="form-control" placeholder="at least 6 characters" name="password" ng-model="editProfile.properties.password" id="password" required ng-minlength="6" compare-to="editProfile.properties.confirmPassword">
+            <span class="help-block has-error" ng-if="changePassword.password.$dirty">
+              <span ng-show="changePassword.password.$error.required">Password is required.</span>
+              <span ng-show="changePassword.password.$error.minlength">Password must be at least 6 characters.</span>
+            </span>
           </div>
           <div class="control-group form-group col-md-12">
             <label>Re-enter your password</label>
-            <input type="password" class="form-control" placeholder="one more time" name="confirmation" ng-model="editProfile.properties.confirmPassword">
+            <input type="password" class="form-control" placeholder="one more time" name="confirmation" ng-model="editProfile.properties.confirmPassword" required>
+            <span class="help-block has-error" ng-if="changePassword.confirmation.$dirty">
+              <span ng-show="changePassword.password.$error.compareTo">Password must match.</span>
+              <span ng-show="changePassword.confirmation.$error.required">Confirmation password is required.</span>
+            </span>
           </div>
-          <button type="submit" class="btn btn-lg btn-success btn-block">
+          <button type="submit" class="btn btn-lg btn-success btn-block" ng-disabled="changePassword.$invalid">
           <span ng-show="changePasswordForm.saving" class="overlord-loading-spinner fa fa-spinner"></span>
           <span ng-show="changePasswordForm.saving">Saving...</span>
           <span ng-hide="changePasswordForm.saving" class="btn-text">Save</span>
