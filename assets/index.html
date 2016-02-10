@@ -25,6 +25,13 @@
     <!--STYLES END-->
   </head>
   <body ng-app="brushfire" ng-controller="homePageController" ng-cloak>
+    <div ng-show="syncingGlobally" class="global-loader" style="position: fixed; z-index: 1000; width: 100%; height: 100%; background: rgba(50,50,50,0.6); padding-top: 150px">
+      <div class="col-sm-4 col-sm-offset-4">
+        <div class="panel panel-default">
+          <h3 class="text-center text-primary loading-message" style="margin-bottom: 15px;">Loading...</h3>
+        </div>
+      </div>
+    </div>
     <div class="container-fluid">
       <!-- Creates the navbar -->
       <nav class="navbar navbar-default navbar-inverse">
@@ -42,6 +49,12 @@
             <li><a href="/#videos">Videos</a></li>
             <li><a href="/#administration">User Administration</a></li>
           </ul>
+          <p ng-show="me" class="navbar-text navbar-right">
+            <span>Welcome, {{me.username}}</span>
+          </p>
+            <ul ng-show="!me" class="nav navbar-nav navbar-right">
+              <li><a href="/#signup">Sign Up</a></li>
+            </ul>
         </div>
       </nav>
       <!-- Angular client-side routes determine the contents of this div. -->

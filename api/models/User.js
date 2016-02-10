@@ -7,7 +7,7 @@
 
 module.exports = {
 
-  connection: 'myPostgresqlServer',
+  connection: 'localDiskDb',
   schema: 'true',
 
   attributes: {
